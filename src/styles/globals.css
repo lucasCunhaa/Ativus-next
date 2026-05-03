@@ -1,0 +1,64 @@
+/* src/styles/globals.css */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font-poppins: 'Poppins', sans-serif;
+  --font-inter:   'Inter', sans-serif;
+
+  /* Cores primárias */
+  --blue:        #2563EB;
+  --blue-dark:   #1E3A8A;
+  --blue-light:  #DBEAFE;
+  --blue-mid:    #3B82F6;
+
+  /* Cores de status */
+  --green:       #22C55E;
+  --green-dark:  #16A34A;
+  --green-light: #DCFCE7;
+  --yellow:      #FACC15;
+  --yellow-light:#FEF9C3;
+  --yellow-dark: #854D0E;
+  --red:         #EF4444;
+  --red-light:   #FEE2E2;
+  --red-dark:    #991B1B;
+
+  /* Neutras */
+  --white:    #FFFFFF;
+  --bg:       #F8FAFF;
+  --bg-card:  #FFFFFF;
+  --text:     #0F172A;
+  --text-2:   #475569;
+  --text-3:   #94A3B8;
+  --border:   #E2E8F0;
+
+  /* Layout */
+  --sidebar-w: 260px;
+  --topbar-h:  68px;
+  --radius:    12px;
+  --radius-lg: 20px;
+  --shadow:    0 4px 24px rgba(37,99,235,0.10);
+  --shadow-lg: 0 8px 48px rgba(37,99,235,0.16);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter), sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
