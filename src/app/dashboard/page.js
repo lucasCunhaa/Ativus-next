@@ -177,7 +177,7 @@ export default function DashboardPage() {
           {NAV_ITEMS.slice(0, 4).map(item => (
             <button key={item.id}
               className={`${styles.navItem} ${page === item.id ? styles.navItemActive : ''}`}
-              onClick={() => { setPage(item.id); setSidebar(false); }}>
+              onClick={() => { if (item.id === 'projetos') { router.push('/dashboard/projetos'); setSidebar(false); } else { setPage(item.id); setSidebar(false); } }}>
               <span className={styles.navIcon}>{item.icon}</span>
               {item.label}
               {item.id === 'tarefas' && pendingBadge > 0 && (
@@ -189,7 +189,7 @@ export default function DashboardPage() {
           {NAV_ITEMS.slice(4, 6).map(item => (
             <button key={item.id}
               className={`${styles.navItem} ${page === item.id ? styles.navItemActive : ''}`}
-              onClick={() => { setPage(item.id); setSidebar(false); }}>
+              onClick={() => { if (item.id === 'projetos') { router.push('/dashboard/projetos'); setSidebar(false); } else { setPage(item.id); setSidebar(false); } }}>
               <span className={styles.navIcon}>{item.icon}</span>
               {item.label}
             </button>
@@ -198,7 +198,7 @@ export default function DashboardPage() {
           {NAV_ITEMS.slice(6).map(item => (
             <button key={item.id}
               className={`${styles.navItem} ${page === item.id ? styles.navItemActive : ''}`}
-              onClick={() => { setPage(item.id); setSidebar(false); }}>
+              onClick={() => { if (item.id === 'projetos') { router.push('/dashboard/projetos'); setSidebar(false); } else { setPage(item.id); setSidebar(false); } }}>
               <span className={styles.navIcon}>{item.icon}</span>
               {item.label}
             </button>
