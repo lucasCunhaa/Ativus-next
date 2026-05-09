@@ -278,11 +278,16 @@ export default function ProjetosPage() {
       {/* ── LISTA DE PROJETOS ── */}
       {view === 'list' && (
         <div>
-          <div className={styles.pageHeader}>
-            <div>
+          {/* Header com gradiente */}
+          <div className={styles.pageHero}>
+            <div className={styles.pageHeroContent}>
+              <div className={styles.pageHeroBadge}>
+                <span className={styles.heroBadgeDot}/>
+                Seus espaços de trabalho
+              </div>
               <h1 className={styles.pageTitle}>Projetos</h1>
               <p className={styles.pageSub}>
-                {projects.length > 0 ? `${projects.length} projeto${projects.length > 1 ? 's' : ''}` : 'Nenhum projeto ainda'}
+                Colabore com sua equipe em tempo real. Crie projetos e compartilhe o código de acesso.
               </p>
             </div>
             <div className={styles.headerActions}>
@@ -294,6 +299,26 @@ export default function ProjetosPage() {
               </button>
             </div>
           </div>
+
+          {/* Barra de stats (só com projetos) */}
+          {!dbLoading && projects.length > 0 && (
+            <div className={styles.statsBar}>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>{projects.length}</span>
+                <span className={styles.statLabel}>Projeto{projects.length > 1 ? 's' : ''}</span>
+              </div>
+              <div className={styles.statDivider}/>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>{projects.filter(p => p.ownerId === user.uid).length}</span>
+                <span className={styles.statLabel}>Como dono</span>
+              </div>
+              <div className={styles.statDivider}/>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>{projects.filter(p => p.ownerId !== user.uid).length}</span>
+                <span className={styles.statLabel}>Participando</span>
+              </div>
+            </div>
+          )}
 
           {dbLoading ? (
             <div className={styles.projectsGrid}>
@@ -322,48 +347,80 @@ export default function ProjetosPage() {
       {/* ── DETALHE DO PROJETO ── */}
       {view === 'detail' && activeProject && (
         <div>
-          {/* Cabeçalho do projeto */}
-          <div className={styles.detailHeader}>
+          {/* Breadcrumb + header */}
+          <div className={styles.detailHero}>
             <button className={styles.backBtn} onClick={backToList}>
               ← Projetos
             </button>
+
             <div className={styles.detailTitleRow}>
               <div className={styles.projectIconLg}>{activeProject.icon}</div>
-              <div>
+              <div className={styles.detailTitleInfo}>
                 <h1 className={styles.pageTitle}>{activeProject.name}</h1>
                 {activeProject.description && (
                   <p className={styles.pageSub}>{activeProject.description}</p>
                 )}
+                <div className={styles.detailOwner}>
+                  Criado por <strong>{activeProject.ownerName}</strong>
+                </div>
               </div>
-              <div className={styles.accessCodeBox}>
-                <span className={styles.accessCodeLabel}>Código de acesso</span>
-                <span className={styles.accessCode}>{activeProject.accessCode}</span>
+            </div>
+
+            {/* Código de acesso em destaque */}
+            <div className={styles.accessCodeCard}>
+              <div className={styles.accessCodeCardLeft}>
+                <span className={styles.accessCodeCardIcon}>🔑</span>
+                <div>
+                  <p className={styles.accessCodeCardLabel}>Código de acesso</p>
+                  <p className={styles.accessCodeCardDesc}>Compartilhe com sua equipe para colaborar</p>
+                </div>
+              </div>
+              <div className={styles.accessCodeCardRight}>
+                <span className={styles.accessCodeValue}>{activeProject.accessCode}</span>
                 <button
-                  className={styles.copyBtn}
-                  onClick={() => {
-                    navigator.clipboard.writeText(activeProject.accessCode);
-                    showToast('success', '📋 Código copiado!');
-                  }}
-                  title="Copiar código"
+                  className={styles.copyBtnFull}
+                  onClick={() => { navigator.clipboard.writeText(activeProject.accessCode); showToast('success', '📋 Código copiado!'); }}
                 >
-                  📋
+                  Copiar
                 </button>
               </div>
             </div>
 
-            {/* Barra de progresso */}
-            <div className={styles.progressSection}>
-              <div className={styles.progressInfo}>
-                <span className={styles.progressLabel}>Progresso geral</span>
-                <span className={styles.progressPct}>{progress}%</span>
+            {/* Stats do projeto */}
+            <div className={styles.detailStats}>
+              <div className={styles.detailStatCard}>
+                <span className={styles.detailStatNum}>{total}</span>
+                <span className={styles.detailStatLabel}>Tarefas</span>
               </div>
-              <div className={styles.progressBar}>
-                <div className={styles.progressFill} style={{ width: `${progress}%` }}/>
+              <div className={styles.detailStatCard}>
+                <span className={styles.detailStatNum} style={{ color: 'var(--green-dark)' }}>{concluded}</span>
+                <span className={styles.detailStatLabel}>Concluídas</span>
               </div>
-              <div className={styles.progressStats}>
-                <span>✅ {concluded} concluídas</span>
-                <span>📋 {total} no total</span>
-                <span>👥 {activeProject.members?.length || 1} membro{activeProject.members?.length !== 1 ? 's' : ''}</span>
+              <div className={styles.detailStatCard}>
+                <span className={styles.detailStatNum} style={{ color: 'var(--blue)' }}>
+                  {projectTasks.filter(t => t.status === 'andamento').length}
+                </span>
+                <span className={styles.detailStatLabel}>Em andamento</span>
+              </div>
+              <div className={styles.detailStatCard}>
+                <span className={styles.detailStatNum}>{activeProject.members?.length || 1}</span>
+                <span className={styles.detailStatLabel}>Membros</span>
+              </div>
+              {/* Progresso circular */}
+              <div className={styles.detailStatCard} style={{ gridColumn: 'span 1' }}>
+                <div className={styles.progressRing}>
+                  <svg viewBox="0 0 36 36" className={styles.progressRingSvg}>
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border)" strokeWidth="3"/>
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--blue)"
+                      strokeWidth="3"
+                      strokeDasharray={`${progress} ${100 - progress}`}
+                      strokeDashoffset="25"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className={styles.progressRingLabel}>{progress}%</span>
+                </div>
+                <span className={styles.detailStatLabel}>Progresso</span>
               </div>
             </div>
           </div>
@@ -371,7 +428,12 @@ export default function ProjetosPage() {
           {/* Tarefas do projeto */}
           <div className={styles.tasksCard}>
             <div className={styles.tasksCardHeader}>
-              <h3 className={styles.cardTitle}>Tarefas do projeto</h3>
+              <div>
+                <h3 className={styles.cardTitle}>Tarefas do projeto</h3>
+                {projectTasks.length > 0 && (
+                  <p className={styles.cardSub}>{projectTasks.length} tarefa{projectTasks.length > 1 ? 's' : ''} · clique para ver detalhes</p>
+                )}
+              </div>
               <button className={styles.btnPrimary} onClick={() => setModal('newTask')}>
                 + Nova tarefa
               </button>
@@ -382,12 +444,13 @@ export default function ProjetosPage() {
                 {[1, 2, 3].map(i => <div key={i} className={styles.taskSkeleton}/>)}
               </div>
             ) : projectTasks.length === 0 ? (
-              <div className={styles.taskEmpty}>
-                <div style={{ fontSize: '2rem', marginBottom: 10 }}>📋</div>
-                <p style={{ fontWeight: 600 }}>Nenhuma tarefa ainda.</p>
-                <p style={{ fontSize: '.8rem', opacity: .7, marginTop: 4 }}>
-                  Clique em &quot;+ Nova tarefa&quot; para começar.
-                </p>
+              <div className={styles.taskEmptyState}>
+                <div className={styles.taskEmptyIcon}>📋</div>
+                <h4 className={styles.taskEmptyTitle}>Nenhuma tarefa ainda</h4>
+                <p className={styles.taskEmptyDesc}>Adicione a primeira tarefa do projeto e comece a colaborar com seu time.</p>
+                <button className={styles.btnPrimary} onClick={() => setModal('newTask')}>
+                  + Criar primeira tarefa
+                </button>
               </div>
             ) : (
               <div className={styles.taskList}>
@@ -418,9 +481,7 @@ export default function ProjetosPage() {
                       className={styles.taskDelete}
                       onClick={e => { e.stopPropagation(); deleteProjectTask(task.id); }}
                       title="Remover"
-                    >
-                      ✕
-                    </button>
+                    >✕</button>
                   </div>
                 ))}
               </div>
@@ -433,25 +494,17 @@ export default function ProjetosPage() {
       {modal === 'create' && (
         <CreateProjectModal
           onClose={() => setModal(null)}
-          onSave={async data => {
-            const result = await createProject(data);
-            if (result) setModal(null);
-          }}
+          onSave={async data => { const result = await createProject(data); if (result) setModal(null); }}
           styles={styles}
         />
       )}
-
       {modal === 'join' && (
         <JoinProjectModal
           onClose={() => setModal(null)}
-          onJoin={async code => {
-            const ok = await joinProject(code);
-            if (ok) setModal(null);
-          }}
+          onJoin={async code => { const ok = await joinProject(code); if (ok) setModal(null); }}
           styles={styles}
         />
       )}
-
       {modal === 'newTask' && (
         <NewTaskModal
           onClose={() => setModal(null)}
@@ -460,7 +513,6 @@ export default function ProjetosPage() {
         />
       )}
 
-      {/* ── PAINEL DE DETALHE DA TAREFA ── */}
       {selectedTask && (
         <TaskDetailPanel
           task={selectedTask}
@@ -471,7 +523,6 @@ export default function ProjetosPage() {
         />
       )}
 
-      {/* ── TOAST ── */}
       {toast.visible && (
         <div className={`${styles.toast} ${styles[toast.type]}`}>{toast.message}</div>
       )}
@@ -486,33 +537,74 @@ export default function ProjetosPage() {
 function EmptyProjects({ onCreate, onJoin, styles }) {
   return (
     <div className={styles.emptyState}>
-      <div className={styles.emptyIcon}>📁</div>
+      {/* Ilustração com cards sobrepostos */}
+      <div className={styles.emptyIllustration}>
+        <div className={styles.emptyCard} style={{ transform: 'rotate(-6deg) translateY(8px)', opacity: .4 }}>
+          <div className={styles.emptyCardDot} style={{ background: '#FACC15' }}/>
+          <div className={styles.emptyCardLines}><div/><div/></div>
+        </div>
+        <div className={styles.emptyCard} style={{ transform: 'rotate(3deg) translateY(4px)', opacity: .65 }}>
+          <div className={styles.emptyCardDot} style={{ background: '#22C55E' }}/>
+          <div className={styles.emptyCardLines}><div/><div/></div>
+        </div>
+        <div className={styles.emptyCard}>
+          <div className={styles.emptyCardDot} style={{ background: '#2563EB' }}/>
+          <div className={styles.emptyCardLines}><div/><div style={{ width: '60%' }}/></div>
+        </div>
+        <div className={styles.emptyPlusIcon}>+</div>
+      </div>
+
       <h3 className={styles.emptyTitle}>Nenhum projeto ainda</h3>
-      <p className={styles.emptyDesc}>Crie um projeto novo ou entre em um existente com o código de acesso.</p>
-      <div className={styles.emptyActions}>
-        <button className={styles.btnPrimary} onClick={onCreate}>+ Criar projeto</button>
-        <button className={styles.btnSecondary} onClick={onJoin}>🔑 Entrar com código</button>
+      <p className={styles.emptyDesc}>
+        Crie seu primeiro projeto e convide seu time com o código de acesso — ou entre em um projeto existente.
+      </p>
+
+      {/* Cards de ação */}
+      <div className={styles.emptyCards}>
+        <button className={styles.emptyActionCard} onClick={onCreate}>
+          <div className={styles.emptyActionIcon} style={{ background: '#EFF6FF' }}>🚀</div>
+          <div className={styles.emptyActionInfo}>
+            <strong>Criar projeto</strong>
+            <span>Comece do zero e convide seu time</span>
+          </div>
+          <span className={styles.emptyActionArrow}>→</span>
+        </button>
+
+        <button className={styles.emptyActionCard} onClick={onJoin}>
+          <div className={styles.emptyActionIcon} style={{ background: '#F0FDF4' }}>🔑</div>
+          <div className={styles.emptyActionInfo}>
+            <strong>Entrar com código</strong>
+            <span>Acesse um projeto que você foi convidado</span>
+          </div>
+          <span className={styles.emptyActionArrow}>→</span>
+        </button>
       </div>
     </div>
   );
 }
 
 function ProjectCard({ project, userId, onOpen, onDelete, onLeave, styles }) {
-  const isOwner = project.ownerId === userId;
+  const isOwner  = project.ownerId === userId;
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Fecha o menu ao clicar fora
+  const handleBlur = () => setTimeout(() => setMenuOpen(false), 150);
 
   return (
     <div className={styles.projectCard} onClick={onOpen}>
+      {/* Faixa colorida no topo */}
+      <div className={styles.projectCardAccent}/>
+
       <div className={styles.projectCardHeader}>
-        <div className={styles.projectIcon}>{project.icon}</div>
-        <div className={styles.projectCardMenu}>
+        <div className={styles.projectIconWrap}>
+          <span className={styles.projectIcon}>{project.icon}</span>
+        </div>
+        <div className={styles.projectCardMenu} onBlur={handleBlur}>
           <button
             className={styles.menuTrigger}
             onClick={e => { e.stopPropagation(); setMenuOpen(m => !m); }}
             title="Opções"
-          >
-            ···
-          </button>
+          >···</button>
           {menuOpen && (
             <div className={styles.menuDropdown} onClick={e => e.stopPropagation()}>
               <button onClick={() => { setMenuOpen(false); navigator.clipboard.writeText(project.accessCode); }}>
@@ -533,16 +625,20 @@ function ProjectCard({ project, userId, onOpen, onDelete, onLeave, styles }) {
       </div>
 
       <h4 className={styles.projectCardName}>{project.name}</h4>
-      {project.description && (
-        <p className={styles.projectCardDesc}>{project.description}</p>
-      )}
+      {project.description
+        ? <p className={styles.projectCardDesc}>{project.description}</p>
+        : <p className={styles.projectCardDescEmpty}>Sem descrição</p>
+      }
 
       <div className={styles.projectCardFooter}>
         <div className={styles.projectCardMeta}>
-          <span>👥 {project.members?.length || 1}</span>
-          <span className={styles.accessCodeChip}>{project.accessCode}</span>
+          <span className={styles.metaChip}>👥 {project.members?.length || 1}</span>
+          <span className={`${styles.metaChip} ${styles.codeChip}`}>{project.accessCode}</span>
         </div>
-        {isOwner && <span className={styles.ownerBadge}>Dono</span>}
+        {isOwner
+          ? <span className={styles.ownerBadge}>Dono</span>
+          : <span className={styles.memberBadge}>Membro</span>
+        }
       </div>
     </div>
   );
