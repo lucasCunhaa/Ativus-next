@@ -11,7 +11,7 @@ import {
   doc, query, orderBy, onSnapshot,
   serverTimestamp,
 } from '@/lib/firebase';
-import styles from './dashboard.module.css';
+import styles from './page.module.css';
 
 // ── Constantes ────────────────────────────────────────────
 const STATUS_LABEL = {
