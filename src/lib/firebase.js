@@ -1,9 +1,4 @@
 // src/lib/firebase.js
-// ════════════════════════════════════════════════════════════
-//  Inicialização do Firebase — singleton seguro para Next.js
-//  Lê credenciais do .env.local via process.env
-// ════════════════════════════════════════════════════════════
-
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
@@ -18,21 +13,14 @@ import {
 } from 'firebase/auth';
 import {
   getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
+  doc, setDoc, getDoc,
+  collection, addDoc, updateDoc, deleteDoc,
+  query, where, orderBy,
+  onSnapshot, getDocs,
   serverTimestamp,
+  arrayUnion, arrayRemove,
 } from 'firebase/firestore';
 
-// ── Configuração via variáveis de ambiente ──
 const firebaseConfig = {
   apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -42,44 +30,22 @@ const firebaseConfig = {
   appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// ── Singleton: evita reinicializar no hot-reload do Next.js ──
 const app  = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ── Providers para login social ──
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
 export {
-  // App
-  app,
-  auth,
-  db,
-
-  // Auth functions
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  updateProfile,
-  signOut,
-  signInWithPopup,
-
-  // Providers
-  googleProvider,
-  githubProvider,
-
-  // Firestore functions
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
+  app, auth, db,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendPasswordResetEmail, updateProfile, signOut, signInWithPopup,
+  googleProvider, githubProvider,
+  doc, setDoc, getDoc,
+  collection, addDoc, updateDoc, deleteDoc,
+  query, where, orderBy,
+  onSnapshot, getDocs,
   serverTimestamp,
+  arrayUnion, arrayRemove,
 };
